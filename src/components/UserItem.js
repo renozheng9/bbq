@@ -2,25 +2,24 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Platform,
   Image,
+  Platform,
   TouchableWithoutFeedback,
-  Text,
   Picker
 } from 'react-native';
-import { Left, Right, Body, Icon, Button, Thumbnail, ListItem } from 'native-base';
+import { Text, Left, Right, Body, Icon, Button, Thumbnail, ListItem } from 'native-base';
 import { Actions } from 'react-native-router-flux';
 import { width } from '../util/AdapterUtil';
 import { FontSize } from '../util/FontSize';
 import { observer, inject } from 'mobx-react';
 import axios from 'axios';
 import { getSign, imei } from '../global/Param';
-import { api_theme_beattention, api_attention_theme } from '../global/Api';
+import { api_user_beattention, api_attention_user } from '../global/Api';
 import { domain } from '../global/Global';
 
 @inject(["globalStore"])
 @observer
-export default class ThemeItem extends Component {
+export default class UserItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -29,7 +28,7 @@ export default class ThemeItem extends Component {
   }
   componentDidMount() {
     axios({
-      url: api_theme_beattention + this.props.item.id,
+      url: api_user_beattention + this.props.item.id,
       method: 'GET',
       headers: {
         'sign': getSign(),
@@ -48,7 +47,7 @@ export default class ThemeItem extends Component {
 
   attend = () => {
     axios({
-      url: api_attention_theme,
+      url: api_attention_user,
       method: this.state.isAttention ? 'DELETE' : 'POST',
       headers: {
         'sign': getSign(),
@@ -72,10 +71,10 @@ export default class ThemeItem extends Component {
     return(
       <View style={{backgroundColor: '#fff', padding: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <View style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
-          <Thumbnail style={{width: width*0.1, height: width*0.1}} source={this.props.item.theme_img ? {uri: `${domain}image/${this.props.item.theme_img}-60-100.png`} : require('../images/person.png')} square />
-          <View style={{maxWidth: width*0.7, marginLeft: 4}}>
-            <Text style={{fontSize: FontSize(12)}} numberOfLines={1} ellipsizeMode="tail">{this.props.item.theme_name + this.props.item.theme_name}</Text>
-            <Text style={{fontSize: FontSize(10)}} note>{this.props.item.theme_introduction}</Text>
+          <Thumbnail style={{width: width*0.1, height: width*0.1}} source={this.props.item.user_avatar ? {uri: `${domain}image/${this.props.item.user_avatar}-60-100.png`} : require('../images/avatar.png')} />
+          <View style={{marginLeft: 4}}>
+            <Text style={{fontSize: FontSize(12)}}>{this.props.item.user_nickname}</Text>
+            <Text style={{fontSize: FontSize(10)}} note>{this.props.item.user_signature}</Text>
           </View>
         </View>
         <TouchableWithoutFeedback onPress={this.attend}>

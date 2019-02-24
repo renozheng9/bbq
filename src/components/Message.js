@@ -1,55 +1,58 @@
 import React, { Component } from 'react';
 import {
+  Platform,
   StyleSheet,
   View,
-  StatusBar,
   FlatList,
-  ImageBackground,
-  Platform,
   TouchableWithoutFeedback,
-  ViewPagerAndroid
+  TouchableNativeFeedback,
+  ToastAndroid
 } from 'react-native';
-import { Actions } from 'react-native-router-flux';
 import { Container, Header, Title, Content, Footer, FooterTab, Button, Text, Left, Right, Body, Icon, Thumbnail, Form, Item, Label, Input, Textarea } from 'native-base';
-import { width } from '../util/AdapterUtil';
 import { FontSize } from '../util/FontSize';
+import { width } from '../util/AdapterUtil';
+import { Actions } from 'react-native-router-flux';
+import { observer, inject } from 'mobx-react';
+import { api_accessToken, api_feedback_type, api_feedback_submit, api_advice_read } from '../global/Api';
 import axios from 'axios';
-import { api_user_beattention_user } from '../global/Api';
 import { getSign, imei } from '../global/Param';
-import { inject, observer } from 'mobx-react';
-import UserItem from './UserItem';
+import MessageItem from './MessageItem';
 
 @inject(["globalStore"])
 @observer
-export default class Fans extends Component {
+export default class Message extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fans: [] // 关注用户数据集
+      message: [] // 我的消息列表
     }
   }
 
   componentDidMount() {
-    axios({
-      url: api_user_beattention_user,
+    axios({ // 获取用户消息
+      url: api_advice_read,
       method: 'GET',
       headers: {
         'sign': getSign(),
         'app-type': Platform.OS,
         'did': imei,
         'access-user-token': this.props.globalStore.token
-      },
-      params: {
-        'id': this.props.userID
       }
     }).then(res => {
-      let fans = [];
-      for(let i = 0; i < res.data.data.length; i++) {
-        res.data.data[i].id = res.data.data[i].user_id;
-        fans.push(res.data.data[i]);
+      let message = this.state.message;
+      for(let i = 0; i < res.data.data.user_advices.length; i++) { // 为消息中的user_advices类型添加该类型type字段
+        res.data.data.user_advices[i].type = 'user_advices';
+        message.push(res.data.data.user_advices[i]);
       }
+      for(let i = 0; i < res.data.data.comment_advices.length; i++) { // 为消息中的comment_advices类型提娜佳该类型type字段
+        res.data.data.comment_advices[i].type = 'comment_advices';
+        message.push(res.data.data.comment_advices[i]);
+      }
+      message.sort((a,b)=>{ // 按时间排序
+        return a.create_time < b.create_time ? 1 : -1;
+      });
       this.setState({
-        fans: fans
+        message: [...message]
       })
     }).catch(err => console.log(err));
   }
@@ -59,14 +62,13 @@ export default class Fans extends Component {
   }
 
   _renderListItem = ({item, separators}) => {
-    return (<UserItem item={item} />)
+    return (<MessageItem item={item} />)
   }
 
   render() {
     return (
       <Container>
-        {/* {Platform === 'android' && (<StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />)} */}
-        <StatusBar barStyle="light-content" hidden={false} translucent={false} backgroundColor="transparent" />
+        {Platform === 'android' && (<StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />)}
         <Header
           androidStatusBarColor="#53BFA2"
           style={styles.header}
@@ -74,15 +76,15 @@ export default class Fans extends Component {
           <TouchableWithoutFeedback onPress={() => {Actions.pop()}}>
             <Icon name="ios-arrow-back" style={styles.backIcon} />
           </TouchableWithoutFeedback>
-          <Text style={styles.title}>{this.props.nickname}的粉丝</Text>
+          <Text style={styles.title}>我的消息</Text>
         </Header>
-        <Content style={styles.content}>
+        <Content style={{backgroundColor: '#EBEBEB'}}>
           <View>
             <FlatList
               showsVerticalScrollIndicator={false}
               ItemSeparatorComponent={this._renderSeparator}
-              data={this.state.fans}
-              keyExtractor={(item, index) => item.user_id.toString()}
+              data={this.state.message}
+              keyExtractor={(item, index) => item.create_time.toString()}
               renderItem={this._renderListItem}
             />
           </View>
@@ -91,7 +93,6 @@ export default class Fans extends Component {
     );
   }
 }
-
 const styles = StyleSheet.create({
   header: {
     height: 50,
@@ -101,14 +102,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#53BFA2'
   },
   backIcon: {
-    fontSize: FontSize(40),
+    fontSize: FontSize(30),
     color: '#fff',
-    marginLeft: 10
+    marginRight: 10
   },
   title: {
-    color: '#fff', fontSize: FontSize(16)
-  },
-  content: {
-    backgroundColor: '#EBEBEB'
+    fontSize: FontSize(16),
+    color: '#fff',
+    fontWeight: 'bold'
   }
 })

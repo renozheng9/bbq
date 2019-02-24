@@ -4,9 +4,9 @@ import { Platform, TouchableWithoutFeedback, StyleSheet, FlatList, View} from 'r
 import { Container, Header, Title, Content, Footer, FooterTab, Button, Text, Icon, Thumbnail, Toast, Input, Item, List, ListItem } from 'native-base';
 import { FontSize } from '../util/FontSize';
 import { width } from '../util/AdapterUtil';
-import HomeListitem from './HomeListitem';
-import UserListitem from './UserListitem';
-import ThemeListitem from './ThemeListitem';
+import HomeItem from './HomeItem';
+import UserItem from './UserItem';
+import ThemeItem from './ThemeItem';
 import { observer, inject } from 'mobx-react';
 import axios from 'axios';
 import { getSign, imei } from '../global/Param';
@@ -34,7 +34,7 @@ export default class Search extends Component {
       method: 'GET',
       headers: {
         'sign': getSign(),
-        'app_type': 'android',
+        'app-type': Platform.OS,
         'did': imei
       },
       params: {
@@ -46,7 +46,20 @@ export default class Search extends Component {
         themeList: [...res.data.data.themes],
         articleList: [...res.data.data.articles]
       })
-    }).catch(err => {console.log(err)});
+    }).catch(err => console.log(err));
+  }
+
+  deleteArticle = (article_id) => {
+    let list = this.state.articleList;
+    for(let i = 0; i < list.length; i++) {
+      if(list[i].article_id == article_id) {
+        list.splice(i, 1);
+        this.setState({
+          articleList: list
+        });
+        break;
+      }
+    }
   }
 
   render() {
@@ -76,9 +89,9 @@ export default class Search extends Component {
               showsVerticalScrollIndicator={false}
               ItemSeparatorComponent={() => {return (<View style={{ height: 1, backgroundColor: '#AEAEAE' }}></View>)}}
               data={this.state.userList}
-              keyExtractor={(item, index) => item.id.toString()}
+              keyExtractor={(item, index) => item.user_nickname.toString()}
               renderItem={({item, separators}) => 
-                <UserListitem item={item} />
+                <UserItem item={item} />
               }
             />
             <ListItem itemDivider>
@@ -88,9 +101,9 @@ export default class Search extends Component {
               showsVerticalScrollIndicator={false}
               ItemSeparatorComponent={() => {return (<View style={{ height: 1, backgroundColor: '#AEAEAE' }}></View>)}}
               data={this.state.themeList}
-              keyExtractor={(item, index) => item.id.toString()}
+              keyExtractor={(item, index) => item.theme_name.toString()}
               renderItem={({item, separators}) => 
-                <ThemeListitem item={item} />
+                <ThemeItem item={item} />
               }
             />
             <ListItem itemDivider>
@@ -101,9 +114,9 @@ export default class Search extends Component {
               showsVerticalScrollIndicator={false}
               ItemSeparatorComponent={() => {return (<View style={{ height: 1, backgroundColor: '#AEAEAE' }}></View>)}}
               data={this.state.articleList}
-              keyExtractor={(item, index) => item.id.toString()}
+              keyExtractor={(item, index) => item.article_id.toString()}
               renderItem={({item, separators}) => 
-                <HomeListitem item={item} />
+                <HomeItem item={item} delete={this.deleteArticle} />
               }
             />
           </List>

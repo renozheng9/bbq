@@ -3,9 +3,6 @@ import {
   Platform,
   StyleSheet,
   View,
-  Alert,
-  Image,
-  TextInput,
   ToastAndroid,
   TouchableWithoutFeedback
 } from 'react-native';
@@ -17,6 +14,7 @@ import axios from 'axios';
 import { Encrypt } from '../util/Encrypt';
 import { getSign, imei } from '../global/Param';
 import { api_code } from '../global/Api';
+import { isPhoneAvailable } from '../util/Function';
 
 export default class Code extends Component {
   constructor(props) {
@@ -43,12 +41,12 @@ export default class Code extends Component {
           },
           headers: {
             'sign': getSign(),
-            'app_type': 'android',
+            'app-type': Platform.OS,
             'did': imei
           }
         }).then(res => {
           console.log(res);
-        }).catch(err => {console.log(err)});
+        }).catch(err => console.log(err));
         let time = this.state.time;
         let text = this.state.text;
         this.setState({
@@ -78,18 +76,9 @@ export default class Code extends Component {
     }
   }
 
-  isPhoneAvailable = (phone) => {
-    var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
-    if (!myreg.test(phone.val())) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
   render() {
     return (
-      <View style={{paddingTop: 10}}>
+      <View style={styles.wrapper}>
         <TouchableWithoutFeedback onPress={this.updateText}>
           <Text style={{color: this.state.text == '获取验证码' ? '#75CEB1' : '#D8F1E9'}}>{this.state.text}</Text>
         </TouchableWithoutFeedback>
@@ -99,5 +88,7 @@ export default class Code extends Component {
 }
 
 const styles = StyleSheet.create({
-
+  wrapper: {
+    paddingTop: 10
+  }
 })

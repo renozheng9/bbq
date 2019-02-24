@@ -16,7 +16,7 @@ import axios from 'axios';
 import { api_article_attention } from '../global/Api';
 import { getSign, imei } from '../global/Param';
 import { inject, observer } from 'mobx-react';
-import TrendListitem from './TrendListitem';
+import TrendItem from './TrendItem';
 
 @inject(["globalStore"])
 @observer
@@ -36,15 +36,15 @@ export default class Trend extends Component {
       methods: 'GET',
       headers: {
         'sign': getSign(),
-        'app_type': 'android',
+        'app-type': Platform.OS,
         'did': imei,
-        'access_user_token': this.props.globalStore.token
+        'access-user-token': this.props.globalStore.token
       }
     }).then(res => {
       let theme = [];
       let user = [];
       for(let i = 0; i < res.data.data.length; i++) {
-        res.data.data[i].isUpvote = 0;
+        res.data.data[i].isUpvote = false;
         if(res.data.data[i].type == 'theme') { // 返回的数据项type字段为theme则添加至theme数组
           theme.push(res.data.data[i]);
         } else { // 返回的数据项type字段为user则添加至user数组
@@ -55,7 +55,7 @@ export default class Trend extends Component {
         theme: theme,
         user: user
       })
-    }).catch(err => {console.log(err)});
+    }).catch(err => console.log(err));
   }
 
   select = () => {
@@ -100,6 +100,27 @@ export default class Trend extends Component {
     }
   }
 
+  deleteArticle = (article_id) => {
+    let user = this.state.user;
+    let theme = this.state.theme;
+    for(let i = 0; i < user.length; i++) {
+      if(user[i].article_id == article_id) {
+        user.splice(i, 1);
+        break;
+      }
+    }
+    for(let i = 0; i < theme.length; i++) {
+      if(theme[i].article_id == article_id) {
+        theme.splice(i, 1);
+        break;
+      }
+    }
+    this.setState({
+      user: user,
+      theme: theme
+    })
+  }
+
   render() {
     return (
       <Container>
@@ -133,7 +154,7 @@ export default class Trend extends Component {
               data={this.state.theme}
               keyExtractor={(item, index) => item.article_id.toString()}
               renderItem={({item, separators}) => 
-                <TrendListitem item={item} update={this.updateData} />
+                <TrendItem item={item} update={this.updateData} delete={this.deleteArticle} />
               }
             />
           </View>
@@ -144,7 +165,7 @@ export default class Trend extends Component {
               data={this.state.user}
               keyExtractor={(item, index) => item.article_id.toString()}
               renderItem={({item, separators}) => 
-                <TrendListitem item={item} update={this.updateData} />
+                <TrendItem item={item} update={this.updateData} />
               }
             />
           </View>

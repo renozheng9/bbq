@@ -3,13 +3,14 @@ import {
   Platform,
   StyleSheet,
   View,
-  TouchableWithoutFeedback,
   TouchableNativeFeedback,
+  TouchableWithoutFeedback
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import { Container, Header, Title, Content, Footer, FooterTab, Button, Text, Left, Right, Body, Icon, Thumbnail, Toast } from 'native-base';
 import { observer, inject } from 'mobx-react';
 import { FontSize } from '../util/FontSize';
+import { domain } from '../global/Global';
 
 @inject(["globalStore"])
 @observer
@@ -27,41 +28,41 @@ export default class Personal extends Component {
         {Platform === 'android' && (<StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />)}
         <Header
           androidStatusBarColor="#53BFA2"
-          style={{height: 50, justifyContent:'center', alignItems: 'center', backgroundColor: '#53BFA2'}}
+          style={styles.header}
         >
-          <Text style={{fontSize: FontSize(16), color: '#fff', fontWeight: 'bold'}}>我的</Text>
+          <Text style={styles.title}>我的</Text>
         </Header>
         {
           this.props.globalStore.status != 0 ?
-          <Content style={{backgroundColor: '#EBEBEB'}}>
+          <Content style={styles.content}>
             <View style={styles.wrapper}>
               <View style={styles.item}>
                 <View style={styles.left}>
-                  <Thumbnail source={require("../images/avatar.png")} style={{width: 46, height: 46, marginRight: 10}} />
-                  <Text style={{fontSize: FontSize(18), color: '#414141'}}>未登录</Text>
+                  <Thumbnail source={require("../images/avatar.png")} style={styles.avatar} />
+                  <Text style={styles.unloginText}>未登录</Text>
                 </View>
                 <TouchableWithoutFeedback onPress={Actions.login}>
-                  <View style={{width: 70, height: 36, borderRadius: 5, borderWidth: 2, borderColor: '#53BFA2', justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={{fontSize: FontSize(14), color: '#53BFA2'}}>去登录</Text>
+                  <View style={styles.toBtn}>
+                    <Text style={styles.toText}>去登录</Text>
                   </View>
                 </TouchableWithoutFeedback>
               </View>
             </View>
           </Content>
           :
-          <Content style={{backgroundColor: '#EBEBEB'}}>
+          <Content style={styles.content}>
             <View style={styles.wrapper}>
               <View style={styles.item}>
                 <View style={styles.left}>
-                  <Thumbnail source={require("../images/avatar.png")} style={{width: 46, height: 46, marginRight: 10}} />
+                  <Thumbnail source={this.props.globalStore.userInfo.avatar ? {uri: `${domain}image/${this.props.globalStore.userInfo.avatar}-80-100.png`} : require("../images/avatar.png")} style={styles.avatar} />
                   <View>
                     <Text style={{fontSize: FontSize(16), color: '#414141'}}>{this.props.globalStore.userInfo.nickname}</Text>
                     <Text style={{fontSize: FontSize(14), color: '#414141'}}>{this.props.globalStore.userInfo.signature}</Text>
                   </View>
                 </View>
                 <TouchableWithoutFeedback onPress={Actions.login}>
-                  <View style={{width: 70, height: 36, borderRadius: 5, borderWidth: 2, borderColor: '#53BFA2', justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={{fontSize: FontSize(14), color: '#53BFA2'}}>去认证</Text>
+                  <View style={styles.toBtn}>
+                    <Text style={styles.toText}>去认证</Text>
                   </View>
                 </TouchableWithoutFeedback>
               </View>
@@ -78,7 +79,7 @@ export default class Personal extends Component {
               </TouchableNativeFeedback>
             </View>
             <View style={styles.wrapper}>
-              <TouchableNativeFeedback>
+              <TouchableNativeFeedback onPress={() => {Actions.push('message')}}>
                 <View style={[styles.item, {borderBottomWidth : 1, borderBottomColor: '#C3C3C3'}]}>
                   <View style={styles.left}>
                     <Icon name="md-notifications" style={{color: "#666666"}} />
@@ -96,7 +97,7 @@ export default class Personal extends Component {
                   <Icon name="md-arrow-dropright" style={{color: "#666666"}} />
                 </View>
               </TouchableNativeFeedback>
-              <TouchableNativeFeedback>
+              <TouchableNativeFeedback onPress={() => {Actions.push('attendTheme', {'nickname': '我'})}}>
                 <View style={styles.item}>
                   <View style={styles.left}>
                     <Icon name="md-heart" style={{color: "#666666"}} />
@@ -159,6 +160,17 @@ export default class Personal extends Component {
   }
 }
 const styles = StyleSheet.create({
+  header: {
+    height: 50,
+    justifyContent:'center',
+    alignItems: 'center',
+    backgroundColor: '#53BFA2'
+  },
+  title: {
+    fontSize: FontSize(16),
+    color: '#fff',
+    fontWeight: 'bold'
+  },
   wrapper: {
     marginBottom: 10,
     backgroundColor: '#fff',
@@ -180,5 +192,30 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 13,
     color: '#676767'
+  },
+  unloginText: {
+    fontSize: FontSize(18),
+    color: '#414141'
+  },
+  toText: {
+    fontSize: FontSize(14),
+    color: '#53BFA2'
+  },
+  toBtn: {
+    width: 70,
+    height: 36,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#53BFA2',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  content: {
+    backgroundColor: '#EBEBEB'
+  },
+  avatar: {
+    width: 46,
+    height: 46,
+    marginRight: 10
   }
 })

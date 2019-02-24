@@ -17,7 +17,7 @@ import axios from 'axios';
 import { api_user_collection } from '../global/Api';
 import { getSign, imei } from '../global/Param';
 import { inject, observer } from 'mobx-react';
-import HomeListitem from './HomeListitem';
+import HomeItem from './HomeItem';
 
 @inject(["globalStore"])
 @observer
@@ -35,15 +35,23 @@ export default class Collection extends Component {
       method: 'GET',
       headers: {
         'sign': getSign(),
-        'app_type': 'android',
+        'app-type': Platform.OS,
         'did': imei,
-        'access_user_token': this.props.globalStore.token
+        'access-user-token': this.props.globalStore.token
       }
     }).then(res => {
       this.setState({
         collection: [...res.data.data]
       })
-    }).catch(err => {console.log(err)});
+    }).catch(err => console.log(err));
+  }
+
+  _renderSeparator = () => {
+    return (<View style={{ height: 1, backgroundColor: '#AEAEAE' }}></View>)
+  }
+
+  _renderListItem = ({item, separators}) => {
+    return (<HomeItem item={item} />)
   }
 
   render() {
@@ -53,27 +61,21 @@ export default class Collection extends Component {
         <StatusBar barStyle="light-content" hidden={false} translucent={false} backgroundColor="transparent" />
         <Header
           androidStatusBarColor="#53BFA2"
-          style={{height: 50, flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center', backgroundColor: '#53BFA2'}}
+          style={styles.header}
         >
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <TouchableWithoutFeedback onPress={() => {Actions.pop()}}>
-              <Icon name="ios-arrow-back" style={{fontSize: FontSize(30), color: '#fff', marginRight: 10}} />
-            </TouchableWithoutFeedback>
-            <Text style={{color: '#fff', fontSize: FontSize(16), fontWeight: 'bold'}}>{this.props.nickname}我的收藏</Text>
-          </View>
+          <TouchableWithoutFeedback onPress={() => {Actions.pop()}}>
+            <Icon name="ios-arrow-back" style={styles.backIcon} />
+          </TouchableWithoutFeedback>
+          <Text style={styles.title}>{this.props.nickname}我的收藏</Text>
         </Header>
-        <Content style={{backgroundColor: '#EBEBEB'}}>
-          <View style={{backgroundColor: '#fff', padding: 10}}>
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              ItemSeparatorComponent={() => {return (<View style={{ height: 1, backgroundColor: '#AEAEAE' }}></View>)}}
-              data={this.state.collection}
-              keyExtractor={(item, index) => item.article_id.toString()}
-              renderItem={({item, separators}) => 
-                <HomeListitem item={item} />
-              }
-            />
-          </View>
+        <Content style={styles.content}>
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={this._renderSeparator}
+            data={this.state.collection}
+            keyExtractor={(item, index) => item.article_id.toString()}
+            renderItem={this._renderListItem}
+          />
         </Content>
       </Container>
     );
@@ -81,4 +83,24 @@ export default class Collection extends Component {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    height: 50,
+    flexDirection: 'row',
+    justifyContent:'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#53BFA2'
+  },
+  backIcon: {
+    fontSize: FontSize(30),
+    color: '#fff',
+    marginRight: 10
+  },
+  title: {
+    color: '#fff',
+    fontSize: FontSize(16),
+    fontWeight: 'bold'
+  },
+  content: {
+    backgroundColor: '#EBEBEB'
+  }
 })
