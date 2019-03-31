@@ -101,7 +101,7 @@ export default class TrendDetail extends Component {
             guid_img: guid_img
           });
           ToastAndroid.show('上传图片成功!', ToastAndroid.SHORT);
-        }).catch((err) => console.log(err))
+        }).catch(err => console.log(err))
       }).catch(err => console.log(err));
     }).catch(err => console.log(err));
   }
@@ -159,20 +159,18 @@ export default class TrendDetail extends Component {
         <StatusBar barStyle="light-content" hidden={false} translucent={false} backgroundColor="transparent" />
         <Header
           androidStatusBarColor="#53BFA2"
-          style={{height: 50, flexDirection: 'row', justifyContent:'flex-start', alignItems: 'center', backgroundColor: '#53BFA2'}}
+          style={styles.header}
         >
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <TouchableWithoutFeedback onPress={() => {Actions.pop()}}>
-              <Icon name="ios-arrow-back" style={{fontSize: FontSize(30), color: '#fff', marginRight: 10}} />
-            </TouchableWithoutFeedback>
-            <Text style={{color: '#fff', fontSize: FontSize(16), fontWeight: 'bold'}}>动态详情</Text>
-          </View>
+          <TouchableWithoutFeedback onPress={() => {Actions.pop()}}>
+            <Icon name="ios-arrow-back" style={styles.backIcon} />
+          </TouchableWithoutFeedback>
+          <Text style={styles.title}>动态详情</Text>
         </Header>
-        <Content style={{backgroundColor: '#EBEBEB'}}>
-          <View style={{backgroundColor: '#fff', marginBottom: 10}}>
+        <Content style={styles.content}>
+          <View style={styles.themeDetail}>
             <ThemeDetailItem item={this.props.item} page="trendDetail" />
           </View>
-          <View style={{padding: 10, backgroundColor: '#fff'}}>
+          <View style={styles.commentWrapper}>
             <FlatList
               showsVerticalScrollIndicator={false}
               ItemSeparatorComponent={() => {return (<View style={{ height: 1, backgroundColor: '#AEAEAE' }}></View>)}}
@@ -185,15 +183,15 @@ export default class TrendDetail extends Component {
           </View>
         </Content>
         <Footer>
-          <View style={{backgroundColor: '#53BFA2', flex: 1, flexDirection: 'row', alignItems: 'center', paddingLeft: 5, paddingRight: 5}}>
+          <View style={styles.footer}>
             <TouchableWithoutFeedback onPress={this.selectImg}>
               <Thumbnail square small source={this.state.img || require('../images/picture.png')} />
             </TouchableWithoutFeedback>
-            <View style={{flex: 1, padding: 10}}>
-              <Input style={{backgroundColor: '#fff', borderRadius: 5, fontSize: FontSize(12), padding: 2}} onChangeText={(text) => {this.setState({comment: text})}} />
+            <View style={styles.inputWrapper}>
+              <Input style={styles.input} onChangeText={(text) => {this.setState({comment: text})}} />
             </View>
             <TouchableWithoutFeedback onPress={this.send}>
-              <Icon name="md-send" style={{fontSize: FontSize(30), color: '#fff'}} />
+              <Icon name="md-send" style={styles.sendIcon} />
             </TouchableWithoutFeedback>
           </View>
         </Footer>
@@ -203,30 +201,54 @@ export default class TrendDetail extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
+  header: {
+    height: 50,
+    flexDirection: 'row',
+    justifyContent:'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#53BFA2'
   },
-  trends: {
-    marginBottom: 20,
-    padding: 10,
-    backgroundColor: '#fff'
-  },
-  comment: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#fff'
+  backIcon: {
+    fontSize: FontSize(30),
+    color: '#fff',
+    marginRight: 10
   },
   title: {
-    marginBottom: 10,
-    fontSize: 16,
-    color: '#666666'
+    color: '#fff',
+    fontSize: FontSize(16),
+    fontWeight: 'bold'
   },
-  line: {
+  content: {
+    backgroundColor: '#EBEBEB'
+  },
+  themeDetail: {
+    backgroundColor: '#fff',
+    marginBottom: 10
+  },
+  commentWrapper: {
+    padding: 10,
+    backgroundColor: '#fff'
+  },
+  footer: {
+    backgroundColor: '#53BFA2',
+    flex: 1,
     flexDirection: 'row',
-    height: 1,
-    backgroundColor: '#AEAEAE'
+    alignItems: 'center',
+    paddingLeft: 5,
+    paddingRight: 5
   },
-  listWrapper: {
-    flex: 1
+  inputWrapper: {
+    flex: 1,
+    padding: 10
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    fontSize: FontSize(12),
+    padding: 2
+  },
+  sendIcon: {
+    fontSize: FontSize(30),
+    color: '#fff'
   }
 })

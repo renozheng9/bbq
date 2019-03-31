@@ -60,7 +60,7 @@ export default class Personal extends Component {
                     <Text style={{fontSize: FontSize(14), color: '#414141'}}>{this.props.globalStore.userInfo.signature}</Text>
                   </View>
                 </View>
-                <TouchableWithoutFeedback onPress={Actions.login}>
+                <TouchableWithoutFeedback onPress={Actions.authentication}>
                   <View style={styles.toBtn}>
                     <Text style={styles.toText}>去认证</Text>
                   </View>

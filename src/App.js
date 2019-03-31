@@ -54,8 +54,8 @@ export default class App extends Component {
   componentDidMount() {
     DeviceStorage.getString('status', '0').then(data => {this.store.updateStatus(data)});
     DeviceStorage.getString('role', '0').then(data => {this.store.updateRole(data)});
-    // DeviceStorage.getString('token', '').then(data => {this.store.updateToken('ab73bcbf8bff913c22f10a2a270ad49047d9e5d456d6ed6fd0721dcd077ec49e8e59d11d8bdbc7df146c44fc8d6e99677a42f63f64ce58eb142b0dad1578766af7365ed602b072669946abf6f0fde6f6')});
-    DeviceStorage.getString('token', '').then(data => {this.store.updateToken(data)});
+    DeviceStorage.getString('token', '').then(data => {this.store.updateToken('9ce8d2f7dde4173837b1cd682c3a7ee97dcfda350551132530e065ae047f5af70141d5fc7c6b583cc7fbaaaac285f7c647b3da3080643e995c8672ac640e7b8eb4475e4b9e45d88231d5a0c98b7bfd13')});
+    // DeviceStorage.getString('token', '').then(data => {this.store.updateToken(data)});
     DeviceStorage.getString('time', '').then(data => {this.store.updateTime(data)});
     DeviceStorage.getJsonObject('userInfo', {}).then(data => {
       if(JSON.stringify(data) == '{}' && this.props.globalStore.token) {
@@ -255,9 +255,9 @@ export default class App extends Component {
         <Root>
         <Router style={styles.container}>
           <Stack key="root">
-            <Scene key="login" component={Login} hideNavBar initial />
+            <Scene key="login" component={Login} hideNavBar />
             <Scene key="authentication" component={Authentication} hideNavBar/>
-            <Scene key="home" component={Home} title="主页" hideNavBar />
+            <Scene key="home" component={Home} title="主页" hideNavBar initial />
             <Scene key="trend" component={Trend} title="动态" hideNavBar />
             <Scene key="personal" component={Personal} title="我" hideNavBar />
             <Scene key="search" component={Search} title="搜索" hideNavBar />

@@ -23,11 +23,12 @@ export default class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      phone: '',
-      code: ''
+      phone: '', // 手机号
+      code: '' // 验证码
     }
   }
   login = () => {
+    // 登录
     axios({
       url: api_login,
       method: 'POST',
@@ -41,27 +42,37 @@ export default class Login extends Component {
         'did': imei
       }
     }).then(res => {
-        DeviceStorage.saveString('token', res.data.data.token).then(data => 
-          console.log(data)
-        ).catch(err => console.log(err));
-        this.setState.props.globalStore.updateToken(res.data.data.token);
-        this.setState.props.globalStore.updateRole(1);
-        axios({
-          url: api_user_read, 
-          method: 'GET',
-          headers: {
-            'sign': getSign(),
-            'app-type': Platform.OS,
-            'did': imei,
-            'access-user-token': res.data.data.token
-          }
-        }).then(res => {
-          let info = Decrypt(res.data.data);
-          DeviceStorage.saveJsonObject('userInfo', JSON.parse(info)).then(data => {
-          }).catch(err => console.log(err));
-          this.props.globalStore.updateUserInfo(JSON.parse(info));
+      // 将token存入缓存
+      DeviceStorage.saveString('token', res.data.data.token).then(data =>
+        console.log(data)
+      ).catch(err => console.log(err));
+      // 更新全局store中的token
+      this.props.globalStore.updateToken(res.data.data.token);
+      // 更新全局store中的role
+      this.props.globalStore.updateRole(1);
+      // 更新全局store中的status
+      this.props.globalStore.updateStatus(1);
+      // 获取用户信息
+      axios({
+        url: api_user_read, 
+        method: 'GET',
+        headers: {
+          'sign': getSign(),
+          'app-type': Platform.OS,
+          'did': imei,
+          'access-user-token': res.data.data.token
+        }
+      }).then(res => {
+        // 对返回数据解密为json字符串
+        let info = Decrypt(res.data.data);
+        // 将解密得到的json字符串格式化为json并缓存
+        DeviceStorage.saveJsonObject('userInfo', JSON.parse(info)).then(data => {
         }).catch(err => console.log(err));
-        Actions.push('home');
+        // 更新全局store中的userInfo
+        this.props.globalStore.updateUserInfo(JSON.parse(info));
+      }).catch(err => console.log(err));
+      // 跳转至首页
+      Actions.push('home');
     }).catch(err => console.log(err));
   }
   render() {
@@ -102,6 +113,9 @@ export default class Login extends Component {
                 <Text style={styles.btnText}>登录</Text>
               </View>
             </TouchableWithoutFeedback>
+          </View>
+          <View>
+            <Text selectable>{this.state.token}</Text>
           </View>
         </Content>
       </Container>

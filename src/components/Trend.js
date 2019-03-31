@@ -45,7 +45,7 @@ export default class Trend extends Component {
       let user = [];
       for(let i = 0; i < res.data.data.length; i++) {
         res.data.data[i].isUpvote = false;
-        if(res.data.data[i].type == 'theme') { // 返回的数据项type字段为theme则添加至theme数组
+        if(res.data.data[i].type == 1) { // 返回的数据项type字段为theme则添加至theme数组
           theme.push(res.data.data[i]);
         } else { // 返回的数据项type字段为user则添加至user数组
           user.push(res.data.data[i]);

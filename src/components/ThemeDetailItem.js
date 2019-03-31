@@ -237,7 +237,7 @@ export default class ThemeDetailItem extends Component {
           </View>
         </Modal>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{flexDirection: 'row', justifyContent: 'flex-start'}}>
+          <View style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
             <Thumbnail style={{width: width*0.1, height: width*0.1, marginRight: 5}} source={this.props.item.user_avatar ? {uri: `${domain}image/${this.props.item.user_avatar}-50-100.png`} : require("../images/avatar.png")} />
             <View>
               <Text style={{fontSize: FontSize(13), color: '#666666'}}>{this.props.item.user_nickname}</Text>

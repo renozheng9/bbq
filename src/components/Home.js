@@ -3,12 +3,13 @@ import {
   Platform,
   StyleSheet,
   View,
+  Modal,
   FlatList,
   StatusBar,
   TouchableWithoutFeedback,
   ImageBackground
 } from 'react-native';
-import { Container, Header, Title, Content, Footer, FooterTab, Button, Text, Left, Right, Body, Icon, Thumbnail } from 'native-base';
+import { Container, Header, Title, Content, Input, Footer, FooterTab, Button, Text, Left, Right, Body, Icon, Thumbnail } from 'native-base';
 import { Actions } from 'react-native-router-flux'
 import { observer, inject } from 'mobx-react';
 import HomeItem from './HomeItem';
@@ -19,6 +20,16 @@ import { getSign, imei } from '../global/Param';
 import { api_article_recommend, api_slideimg } from '../global/Api';
 import Carousel from 'react-native-snap-carousel';
 import { domain } from '../global/Global';
+import ImageViewer from 'react-native-image-zoom-viewer';
+
+const images = [
+  {
+    props: {
+      url: '',
+      source: require('../images/person.png')
+    }
+  }
+]
 
 @inject(["globalStore"])
 @observer
@@ -151,17 +162,12 @@ export default class Home extends Component {
           androidStatusBarColor="#53BFA2"
           style={styles.header}
         >
-          <View>
-            <Text style={styles.title}>首页</Text>
-          </View>
-          <View style={styles.operations}>
-            <TouchableWithoutFeedback onPress={() => Actions.push('edit')}>
-              <Icon name="md-create" style={styles.createIcon} />
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback onPress={() => Actions.push('search')}>
+          <TouchableWithoutFeedback onPress={Actions.search}>
+            <View style={styles.searchWrapper}>
               <Icon name="md-search" style={styles.searchIcon} />
-            </TouchableWithoutFeedback>
-          </View>
+              <Input style={styles.searchInput} placeholder="Token招新" editable={false} />
+            </View>
+          </TouchableWithoutFeedback>
         </Header>
         <View style={styles.wrapper}>
         {/* <Content style={{backgroundColor: '#fff'}}> */}
@@ -216,26 +222,27 @@ const styles = StyleSheet.create({
   header: {
     height: 50,
     flexDirection: 'row',
-    justifyContent:'space-between',
+    justifyContent:'center',
     alignItems: 'center',
     backgroundColor: '#53BFA2'
   },
-  title: {
-    fontSize: FontSize(16),
-    color: '#fff',
-    fontWeight: 'bold'
-  },
-  operations: {
-    flexDirection: 'row'
-  },
-  createIcon: {
-    fontSize: FontSize(20),
-    color: '#fff',
-    marginRight: 20
+  searchWrapper: {
+    height: 34,
+    width: width*0.9,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    paddingRight: 6,
+    paddingLeft: 6
   },
   searchIcon: {
-    fontSize: FontSize(22),
-    color: '#fff'
+    fontSize: FontSize(20),
+    color: '#888888'
+  },
+  searchInput: {
+    fontSize: FontSize(12),
+    color: '#888888'
   },
   wrapper: {
     flex: 1

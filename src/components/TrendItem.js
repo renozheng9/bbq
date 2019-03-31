@@ -256,17 +256,17 @@ export default class TrendItem extends Component {
         </Modal>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableWithoutFeedback onPress={() => {
-            this.state.item.type == 'theme' ?
+            this.state.item.type == 1 ?
             Actions.push('themeDetail', {'theme': this.props.item})
             :
             Actions.push('zone', {'user': this.props.item})
           }}>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {
-                this.state.item.type == 'theme' ?
-                <Thumbnail square style={{width: width*0.1, height: width*0.1, marginRight: 5}} source={this.props.item.theme_img ? {uri: `${domain}image/${this.props.item.theme_img}-60-100.png`} : require("../images/theme.png")} />
+                this.state.item.type == 1 ?
+                <Thumbnail square style={{width: width*0.08, height: width*0.08, marginRight: 5}} source={this.props.item.theme_img ? {uri: `${domain}image/${this.props.item.theme_img}-60-100.png`} : require("../images/theme.png")} />
                 :
-                <Thumbnail style={{width: width*0.1, height: width*0.1, marginRight: 5}} source={this.props.item.user_avatar ? {uri: `${domain}image/${this.props.item.user_avatar}-50-100.png`} : require("../images/avatar.png")} />
+                <Thumbnail style={{width: width*0.08, height: width*0.08, marginRight: 5}} source={this.props.item.user_avatar ? {uri: `${domain}image/${this.props.item.user_avatar}-50-100.png`} : require("../images/avatar.png")} />
               }
               <View>
                 <Text style={{fontSize: FontSize(13), color: '#666666'}}>{this.state.item.type == 'theme' ? this.state.item.theme_name : this.state.item.user_nickname}</Text>
@@ -281,7 +281,7 @@ export default class TrendItem extends Component {
           </View>
         </View>
         <TouchableWithoutFeedback onPress={() => {Actions.push('trendDetail', {'item': this.state.item})}}>
-          <View style={{paddingLeft: width*0.08}}>
+          <View style={{marginTop: 8}}>
             <Text numberOfLines={8} ellipsizeMode="tail" style={{fontSize: FontSize(13), color: '#666666'}}>{this.state.item.article_content}</Text>
             <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
               {this.state.imgComponents}
@@ -290,17 +290,17 @@ export default class TrendItem extends Component {
         </TouchableWithoutFeedback>
         <View style={{marginTop: 10, flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableWithoutFeedback onPress={() => {
-            this.state.item.type == 'theme' ?
+            this.state.item.type == 1 ?
             Actions.push('zone', {'user': this.props.item})
             :
             Actions.push('themeDetail', {'theme': this.props.item})
           }}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {
-                this.state.item.type == 'theme' ?
-                <Thumbnail style={{width: width*0.1, height: width*0.1, marginRight: 5}} source={this.props.item.user_avatar ? {uri: `${domain}image/${this.props.item.user_avatar}-60-100.png`} : require("../images/avatar.png")} />
+                this.state.item.type == 1 ?
+                <Thumbnail style={{width: width*0.07, height: width*0.07, marginRight: 5}} source={this.props.item.user_avatar ? {uri: `${domain}image/${this.props.item.user_avatar}-60-100.png`} : require("../images/avatar.png")} />
                 :
-                <Thumbnail square style={{width: width*0.1, height: width*0.1, marginRight: 5}} source={this.props.item.theme_img ? {uri: `${domain}image/${this.props.item.theme_img}-50-100.png`} : require("../images/theme.png")} />
+                <Thumbnail square style={{width: width*0.07, height: width*0.07, marginRight: 5}} source={this.props.item.theme_img ? {uri: `${domain}image/${this.props.item.theme_img}-50-100.png`} : require("../images/theme.png")} />
               }
               <Text style={{fontSize: FontSize(13), color: '#666666'}}>{this.state.item.type == 'theme' ? this.state.item.user_nickname : this.state.item.theme_name}</Text>
             </View>

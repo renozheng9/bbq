@@ -43,6 +43,15 @@ export default class Edit extends Component {
   }
 
   componentDidMount() {
+    let imgComponents = [];
+    for(let i = 0; i < this.props.item.article_img.length; i++) {
+      imgComponents.push(
+        <Thumbnail square key={this.props.item.article_id} source={{uri: `${domain}image/${this.props.item.article_img[i]}-80-100.png`}} style={{width: width*0.2, height: width*0.2, margin: 5, backgroundColor: '#EBEBEB'}} />
+      )
+    }
+    this.setState({
+      imgComponents: imgComponents
+    });
     axios({ // 获取所有主题
       url: api_theme_all,
       method: 'GET',
@@ -156,13 +165,6 @@ export default class Edit extends Component {
   }
 
   render() {
-    if(this.props.item) {
-      for(let i = 0; i < this.props.item.article_img.length; i++) {
-        imgComponents.push(
-          <Thumbnail square key={this.props.item.article_id} source={{uri: `${domain}image/${this.props.item.article_img[i]}-80-100.png`}} style={{width: width*0.2, height: width*0.2, margin: 5, backgroundColor: '#EBEBEB'}} />
-        )
-      }
-    }
     return (
       <Container>
         {Platform === 'android' && (<StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />)}
@@ -200,9 +202,6 @@ export default class Edit extends Component {
               style={styles.picker}
               onValueChange={(itemValue, itemIndex) => this.setState({choice: itemValue})}>
               {this.state.themeList}
-              {/* <Picker.Item label="加入收藏" value="collect" />
-              <Picker.Item label="对该主题不感兴趣" value="dislike" />
-              <Picker.Item label="举报" value="report" /> */}
             </Picker>      
           </View>
           <View style={styles.optionWrapper}>

@@ -18,7 +18,7 @@ import { observer, inject } from 'mobx-react';
 import axios from 'axios';
 import { getSign, imei } from '../global/Param';
 import { domain } from '../global/Global';
-import { api_upvote_article, api_report, api_article_becollection, api_collection_article } from '../global/Api';
+import { api_upvote_article, api_report, api_article_becollection, api_collection_article, api_user_beattention, api_attention_user } from '../global/Api';
 
 const imgWidth = width - width*0.08;
 
@@ -28,6 +28,7 @@ export default class HomeItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isAttention: false, // 是否关注该用户
       choice: '', // 二级菜单选择的内容
       modalVisible: false, // 模态框是否显示
       item: {...this.props.item, 'isUpvote': false}, // 列表数据集
@@ -92,6 +93,22 @@ export default class HomeItem extends Component {
         })
       }
     }).catch(err => console.log(err));
+    axios({ // 获取是否关注该用户
+      url: api_user_beattention + this.state.item.user_id,
+      method: 'GET',
+      headers: {
+        'sign': getSign(),
+        'app-type': Platform.OS,
+        'did': imei,
+        'access-user-token': this.props.globalStore.token
+      }
+    }).then(res => {
+      if(res.data.data.isAttention) {
+        this.setState({
+          isAttention: 1
+        })
+      }
+    }).catch(err => console.log(err));
   }
 
   componentWillUnmount() {
@@ -103,7 +120,7 @@ export default class HomeItem extends Component {
   upvote = () => { // 点赞
     let item = this.state.item;
     let isUpvote = item.isUpvote;
-    if(this.state.item.isUpvote) {
+    if(isUpvote) {
       item.isUpvote = false;
       item.likes--;
     } else {
@@ -126,19 +143,35 @@ export default class HomeItem extends Component {
         'id': this.state.item.article_id
       }
     }).then(res => {
-      if(res.data.status) {
-        let item = this.state.item;
-        if(isUpvote) {
-          item.isUpvote = true;
-          item.likes++;
-        } else {
-          item.isUpvote = false;
-          item.likes--;
-        }
-        this.setState({
-          item: item
-        })
+      
+    }).catch(err => console.log(err));
+  }
+
+  attend = () => {
+    let isAttention = this.state.isAttention;
+    if(isAttention) {
+      this.setState({
+        isAttention: false
+      })
+    } else {
+      this.setState({
+        isAttention: true
+      })
+    }
+    axios({
+      url: api_attention_user,
+      method: isAttention ? 'DELETE' : 'POST',
+      headers: {
+        'sign': getSign(),
+        'app-type': Platform.OS,
+        'did': imei,
+        'access-user-token': this.props.globalStore.token
+      },
+      data: {
+        'id': this.state.item.user_id
       }
+    }).then(res => {
+
     }).catch(err => console.log(err));
   }
 
@@ -247,45 +280,41 @@ export default class HomeItem extends Component {
           </View>
         </Modal>
         <View style={styles.header}>
-          <TouchableWithoutFeedback onPress={() => {Actions.push('themeDetail', {'theme': this.props.item})}}>
+          <TouchableWithoutFeedback onPress={() => {Actions.push('zone', {'user': this.props.item})}}>
             <View style={styles.infoWrapper}>
-              <Thumbnail style={styles.themeImg} source={this.props.item.theme_img ? {uri: `${domain}image/${this.props.item.theme_img}-60-100.png`} : require("../images/theme.png")} />
+            <Thumbnail style={styles.avatar} source={this.props.item.user_avatar ? {uri: `${domain}image/${this.props.item.user_avatar}-50-100.png`} : require("../images/avatar.png")} />
               <View>
-                <Text style={styles.themename}>{this.props.item.theme_name}</Text>
+                <Text style={styles.nickname}>{this.props.item.user_nickname}</Text>
                 <Text style={styles.createtime}>{this.props.item.create_time}</Text>
               </View>
             </View>
           </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={this.choose}>
-            <Icon name="md-arrow-dropdown" style={styles.dropdown}></Icon>
+          <TouchableWithoutFeedback onPress={this.attend}>
+            <View style={styles.attentionWrapper}>
+              <Text style={styles.attentionText}>{this.state.isAttention ? '已关注' : '+ 关注'}</Text>
+            </View>
           </TouchableWithoutFeedback>
+          {/* <TouchableWithoutFeedback onPress={this.choose}>
+            <Icon name="md-arrow-dropdown" style={styles.dropdown}></Icon>
+          </TouchableWithoutFeedback> */}
         </View>
         <TouchableWithoutFeedback onPress={() => {Actions.push('trendDetail', {'item': this.state.item})}}>
           <View style={styles.contentWrapper}>
             <Text numberOfLines={8} ellipsizeMode="tail" style={styles.contentText}>{this.props.item.article_content}</Text>
-            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+            <View style={styles.imgWrapper}>
               {this.state.imgComponents}
             </View>
           </View>
         </TouchableWithoutFeedback>
+        <View style={styles.themeWrapper}>
+          <Text style={styles.themename}>{this.props.item.theme_name}</Text>
+        </View>
         <View style={styles.bottom}>
-          <TouchableWithoutFeedback onPress={() => {Actions.push('zone', {'user': this.props.item})}}>
-            <View style={styles.authorWrapper}>
-              <Thumbnail style={styles.avatar} source={this.props.item.user_avatar ? {uri: `${domain}image/${this.props.item.user_avatar}-50-100.png`} : require("../images/avatar.png")} />
-              <Text style={styles.nickname}>{this.props.item.user_nickname}</Text>
-            </View>
-          </TouchableWithoutFeedback>
           <View style={styles.operations}>
-            <TouchableWithoutFeedback onPress={this.delete}>
-              <View style={[styles.operation, {display: this.props.item.user_id == this.props.globalStore.userInfo.id ? 'flex' : 'none'}]}>
-                <Icon name="md-trash" style={styles.operationIcon} />
-                <Text style={styles.operationText}>删除</Text>
-              </View>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback onPress={() => {Actions.push('edit', {'item': this.state.item})}}>
-              <View style={[styles.operation, {display: this.props.item.user_id == this.props.globalStore.userInfo.id ? 'flex' : 'none'}]}>
-                <Icon name="md-create" style={styles.operationIcon} />
-                <Text style={styles.operationText}>编辑</Text>
+            <TouchableWithoutFeedback onPress={() => {Actions.push('trendDetail', {'item': this.state.item})}}>
+              <View style={styles.operation}>
+                <Icon name="md-share" style={styles.operationIcon} />
+                <Text style={styles.operationText}>转发</Text>
               </View>
             </TouchableWithoutFeedback>
             <TouchableWithoutFeedback onPress={() => {Actions.push('trendDetail', {'item': this.state.item})}}>
@@ -301,6 +330,9 @@ export default class HomeItem extends Component {
               </View>
             </TouchableWithoutFeedback>
           </View>
+          <TouchableWithoutFeedback onPress={this.choose}>
+            <Text style={styles.operationText}>更多</Text>
+          </TouchableWithoutFeedback>
         </View>
       </View>
     );
@@ -314,7 +346,7 @@ const styles = StyleSheet.create({
     marginRight: 20
   },
   wrapper: {
-    padding: 5,
+    padding: 10,
     backgroundColor: '#fff'
   },
   header: {
@@ -323,17 +355,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   infoWrapper: {
-    flexDirection: 'row'
-  },
-  themeImg: {
-    width: width*0.08,
-    height: width*0.08,
-    marginRight: 5,
-    borderRadius: 5
-  },
-  themename: {
-    fontSize: FontSize(13),
-    color: '#666666'
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   createtime: {
     fontSize: FontSize(11),
@@ -344,16 +367,17 @@ const styles = StyleSheet.create({
     color: '#666666'
   },
   contentWrapper: {
-    paddingLeft: width*0.08
+    paddingTop: 5,
+    paddingBottom: 5
   },
   contentText: {
-    fontSize: FontSize(13),
+    fontSize: FontSize(14),
     color: '#666666'
   },
   contentImg: {
-    margin: 5,
-    width: imgWidth*0.3,
-    height: imgWidth*0.3
+    margin: width*0.02,
+    width: width*0.25,
+    height: width*0.25
   },
   bottom: {
     marginTop: 10,
@@ -370,19 +394,44 @@ const styles = StyleSheet.create({
     marginRight: 5
   },
   nickname: {
-    fontSize: FontSize(12),
+    fontSize: FontSize(13),
     color: '#666666'
   },
   operations: {
     flexDirection: 'row'
   },
   operationIcon: {
-    fontSize: FontSize(12),
+    fontSize: FontSize(14),
     color: '#666666',
     marginRight: 5
   },
   operationText: {
-    fontSize: FontSize(12),
+    fontSize: FontSize(14),
     color: '#666666'
+  },
+  attentionWrapper: {
+    padding: 4,
+    borderColor: '#53BFA2',
+    borderWidth: 2,
+    borderRadius: 4
+  },
+  attentionText: {
+    fontSize: FontSize(12),
+    color: '#53BFA2'
+  },
+  imgWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  themeWrapper: {
+    alignItems: 'flex-start'
+  },
+  themename: {
+    padding: 5,
+    borderRadius: 5,
+    borderColor: '#53BFA2',
+    borderWidth: 2,
+    color: '#53BFA2',
+    fontSize: FontSize(12)
   }
 })

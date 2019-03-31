@@ -22,6 +22,7 @@
     "react-native-code-push": "^5.5.2",
     "react-native-device-info": "^0.24.3",
     "react-native-image-crop-picker": "^0.21.3",
+    "react-native-image-zoom-viewer": "^2.2.25",
     "react-native-imei": "^0.1.2",
     "react-native-router-flux": "^4.0.6",
     "react-native-snap-carousel": "^3.7.5",
